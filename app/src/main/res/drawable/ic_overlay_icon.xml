@@ -1,0 +1,27 @@
+<!-- The Kharcha app glyph (wallet) with a "+" badge, used on the floating button. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+
+    <!-- Wallet, scaled up and centred (white, like the launcher icon). -->
+    <group
+        android:scaleX="1.5"
+        android:scaleY="1.5"
+        android:translateX="3"
+        android:translateY="3">
+        <path
+            android:fillColor="#FFFFFF"
+            android:pathData="M21,7H5C4.45,7 4,6.55 4,6C4,5.45 4.45,5 5,5H19V3H5C3.34,3 2,4.34 2,6V18C2,19.66 3.34,21 5,21H21C22.1,21 23,20.1 23,19V9C23,7.9 22.1,7 21,7ZM16,14C15.17,14 14.5,13.33 14.5,12.5C14.5,11.67 15.17,11 16,11C16.83,11 17.5,11.67 17.5,12.5C17.5,13.33 16.83,14 16,14Z" />
+    </group>
+
+    <!-- Coral badge circle in the bottom-right corner. -->
+    <path
+        android:fillColor="#FF7043"
+        android:pathData="M31,39 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0 z" />
+    <!-- White "+" inside the badge. -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M38,35 h2 v3 h3 v2 h-3 v3 h-2 v-3 h-3 v-2 h3 z" />
+</vector>
