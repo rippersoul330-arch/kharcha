@@ -76,6 +76,20 @@ fun SettingsContent(
                         onCheckedChange = { actions.onToggleShake(it) }
                     )
                 }
+                Spacer(modifier = Modifier.height(12.dp))
+                OutlinedButton(
+                    onClick = actions.onTestOverlay,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Test the floating button")
+                }
+                Text(
+                    "Tap to show the button now (no shake). If it doesn't appear, the " +
+                        "\"appear on top\" permission isn't granted yet.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 6.dp)
+                )
             }
         }
 

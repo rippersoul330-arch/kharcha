@@ -12,6 +12,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.kharcha.app.overlay.OverlayController
 import com.kharcha.app.overlay.QuickEntryActivity
 import com.kharcha.app.service.ShakeDetectionService
 import com.kharcha.app.ui.AppActions
@@ -30,6 +31,9 @@ import kotlinx.coroutines.withContext
 class MainActivity : ComponentActivity() {
 
     private lateinit var prefs: Prefs
+
+    // Used only by the "Test floating button" action in Settings.
+    private val overlayController by lazy { OverlayController(this) }
 
     // Live status the UI observes; refreshed in onResume.
     private val statusState = mutableStateOf(AppStatus(false, false, false))
@@ -73,6 +77,7 @@ class MainActivity : ComponentActivity() {
                         onToggleShake = ::toggleShake,
                         onGrantOverlay = ::requestOverlayPermission,
                         onIgnoreBattery = ::openBatterySettings,
+                        onTestOverlay = ::testOverlay,
                         onExport = ::startExport,
                         onSendFeedback = ::sendFeedback
                     )
@@ -146,6 +151,26 @@ class MainActivity : ComponentActivity() {
             Uri.parse("package:$packageName")
         )
         overlaySettingsLauncher.launch(intent)
+    }
+
+    /** Shows the floating button right now (no shake) to test the overlay permission. */
+    private fun testOverlay() {
+        if (Settings.canDrawOverlays(this)) {
+            overlayController.showFloatingButton()
+            Toast.makeText(
+                this,
+                "If you see the button on screen, the overlay works! It hides in a few seconds.",
+                Toast.LENGTH_LONG
+            ).show()
+        } else {
+            Toast.makeText(this, "First allow \"appear on top\" below.", Toast.LENGTH_SHORT).show()
+            requestOverlayPermission()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        overlayController.hideAll()
     }
 
     @Suppress("BatteryLife")

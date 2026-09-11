@@ -7,6 +7,7 @@ data class AppActions(
     val onToggleShake: (Boolean) -> Unit,
     val onGrantOverlay: () -> Unit,
     val onIgnoreBattery: () -> Unit,
+    val onTestOverlay: () -> Unit,
     val onExport: () -> Unit,
     val onSendFeedback: () -> Unit
 )
