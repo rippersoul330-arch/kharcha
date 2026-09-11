@@ -5,17 +5,17 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.lifecycleScope
-import com.kharcha.app.data.Category
 import com.kharcha.app.data.Expense
+import com.kharcha.app.data.KharchaRepository
 import com.kharcha.app.kharchaRepository
 import com.kharcha.app.ui.QuickEntryScreen
 import com.kharcha.app.ui.theme.KharchaTheme
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 /**
@@ -34,12 +34,11 @@ class QuickEntryActivity : ComponentActivity() {
 
         setContent {
             KharchaTheme {
-                var categories by remember { mutableStateOf<List<Category>>(emptyList()) }
+                val categories by repository.observeCategories().collectAsState(initial = emptyList())
                 var existing by remember { mutableStateOf<Expense?>(null) }
                 var loaded by remember { mutableStateOf(editId == null) }
 
                 LaunchedEffect(Unit) {
-                    categories = repository.observeCategories().first()
                     if (editId != null) {
                         existing = repository.getExpense(editId)
                         loaded = true
@@ -49,6 +48,7 @@ class QuickEntryActivity : ComponentActivity() {
                 if (loaded) {
                     QuickEntryScreen(
                         categories = categories,
+                        palette = KharchaRepository.CATEGORY_PALETTE,
                         initialAmountPaise = existing?.amountPaise,
                         initialCategoryId = existing?.categoryId,
                         initialNote = existing?.note,
@@ -56,6 +56,7 @@ class QuickEntryActivity : ComponentActivity() {
                         onSave = { amountPaise, categoryId, note ->
                             saveExpense(editId, existing, amountPaise, categoryId, note)
                         },
+                        onAddCategory = { name, color -> repository.addCategory(name, color) },
                         onDelete = if (editId != null) {
                             { deleteExpense(existing) }
                         } else null,

@@ -63,6 +63,13 @@ class KharchaRepository(
     suspend fun getAllExpensesForExport(): List<ExpenseWithCategory> = expenseDao.getAllForExport()
 
     companion object {
+        /** Colours offered when the user creates a new category. */
+        val CATEGORY_PALETTE = listOf(
+            "#FF7043", "#66BB6A", "#42A5F5", "#FFA726",
+            "#AB47BC", "#26A69A", "#EC407A", "#78909C",
+            "#8D6E63", "#5C6BC0", "#EF5350", "#9CCC65"
+        )
+
         /** Built-in starter categories with distinct pie-chart colours. */
         val DEFAULT_CATEGORIES = listOf(
             Category(name = "Snacks", colorHex = "#FF7043", isDefault = true),

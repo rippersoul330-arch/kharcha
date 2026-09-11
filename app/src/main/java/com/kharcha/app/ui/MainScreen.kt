@@ -19,7 +19,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,7 +48,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-private enum class Tab { HOME, CATEGORIES, SETTINGS }
+private enum class Tab { HOME, SETTINGS }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,12 +72,6 @@ fun MainScreen(
                     label = { Text("Home") }
                 )
                 NavigationBarItem(
-                    selected = tab == Tab.CATEGORIES,
-                    onClick = { tab = Tab.CATEGORIES },
-                    icon = { Icon(Icons.Filled.Category, contentDescription = "Categories") },
-                    label = { Text("Categories") }
-                )
-                NavigationBarItem(
                     selected = tab == Tab.SETTINGS,
                     onClick = { tab = Tab.SETTINGS },
                     icon = { Icon(Icons.Filled.Settings, contentDescription = "Settings") },
@@ -97,7 +90,6 @@ fun MainScreen(
         Box(modifier = Modifier.padding(padding)) {
             when (tab) {
                 Tab.HOME -> HomeContent(viewModel, actions)
-                Tab.CATEGORIES -> CategoriesContent(viewModel)
                 Tab.SETTINGS -> SettingsContent(status, actions)
             }
         }
