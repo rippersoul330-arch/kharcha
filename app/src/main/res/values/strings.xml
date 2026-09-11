@@ -12,6 +12,9 @@
     <string name="expense_updated">Expense updated</string>
     <string name="expense_deleted">Expense deleted</string>
 
+    <!-- Overlay -->
+    <string name="remove_button_desc">Drag here to remove</string>
+
     <!-- Feedback -->
     <!-- TODO: change this to the email you want tester feedback sent to. -->
     <string name="feedback_email">you@example.com</string>
