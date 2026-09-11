@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Kharcha</string>
+
+    <!-- Shake service notification -->
+    <string name="service_notification_title">Kharcha is running</string>
+    <string name="service_notification_text">Shake your phone anywhere to log an expense.</string>
+    <string name="service_channel_name">Shake listener</string>
+    <string name="service_channel_description">Keeps Kharcha ready to log an expense when you shake your phone.</string>
+
+    <!-- Toasts -->
+    <string name="expense_saved">Expense saved</string>
+    <string name="expense_updated">Expense updated</string>
+    <string name="expense_deleted">Expense deleted</string>
+
+    <!-- Feedback -->
+    <!-- TODO: change this to the email you want tester feedback sent to. -->
+    <string name="feedback_email">you@example.com</string>
+    <string name="feedback_subject">Kharcha feedback</string>
+</resources>

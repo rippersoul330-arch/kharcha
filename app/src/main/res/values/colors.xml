@@ -1,0 +1,9 @@
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Brand colours -->
+    <color name="brand_primary">#FF6D4C41</color>       <!-- warm brown -->
+    <color name="brand_accent">#FFFF7043</color>        <!-- coral accent (also overlay button) -->
+    <color name="ic_launcher_background">#FF6D4C41</color>
+</resources>
