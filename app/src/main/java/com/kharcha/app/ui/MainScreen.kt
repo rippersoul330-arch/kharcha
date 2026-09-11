@@ -30,6 +30,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -47,6 +48,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -115,7 +117,15 @@ fun MainScreen(
         Box(modifier = Modifier.padding(padding)) {
             when (tab) {
                 Tab.HOME -> HomeContent(viewModel, actions)
-                Tab.SETTINGS -> SettingsContent(status, actions)
+                Tab.SETTINGS -> {
+                    val budget by viewModel.monthlyBudget.collectAsState()
+                    SettingsContent(
+                        status = status,
+                        actions = actions,
+                        budgetPaise = budget,
+                        onSetBudget = viewModel::setMonthlyBudget
+                    )
+                }
             }
         }
     }
@@ -127,6 +137,7 @@ private fun HomeContent(viewModel: HomeViewModel, actions: AppActions) {
     val totals by viewModel.categoryTotals.collectAsState()
     val grandTotal by viewModel.monthTotal.collectAsState()
     val expenses by viewModel.expenses.collectAsState()
+    val budget by viewModel.monthlyBudget.collectAsState()
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -177,6 +188,11 @@ private fun HomeContent(viewModel: HomeViewModel, actions: AppActions) {
             }
         }
 
+        // Budget progress (only for the current month, and only if a budget is set)
+        if (budget > 0 && month.isCurrentMonth()) {
+            item { BudgetBar(spentPaise = grandTotal, budgetPaise = budget) }
+        }
+
         // Expenses section header
         item {
             Row(
@@ -210,6 +226,67 @@ private fun HomeContent(viewModel: HomeViewModel, actions: AppActions) {
                     onClick = { actions.onEditExpense(expense.id) }
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun BudgetBar(spentPaise: Long, budgetPaise: Long) {
+    val fraction = if (budgetPaise > 0)
+        (spentPaise.toFloat() / budgetPaise.toFloat()).coerceIn(0f, 1f) else 0f
+    val over = spentPaise > budgetPaise
+    val nearLimit = spentPaise >= budgetPaise * 0.8f
+
+    val green = Color(0xFF2E7D32)
+    val amber = Color(0xFFF9A825)
+    val barColor = when {
+        over -> MaterialTheme.colorScheme.error
+        nearLimit -> amber
+        else -> green
+    }
+
+    ElevatedCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 12.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Monthly budget",
+                    style = MaterialTheme.typography.titleSmall,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = "${Money.formatRupees(spentPaise)} of ${Money.formatRupees(budgetPaise)}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            LinearProgressIndicator(
+                progress = { fraction },
+                color = barColor,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                strokeCap = StrokeCap.Round,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(10.dp)
+            )
+            Spacer(modifier = Modifier.height(10.dp))
+            Text(
+                text = if (over)
+                    "${Money.formatRupees(spentPaise - budgetPaise)} over budget"
+                else
+                    "${Money.formatRupees(budgetPaise - spentPaise)} left",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium,
+                color = barColor
+            )
         }
     }
 }

@@ -7,6 +7,7 @@ import com.kharcha.app.KharchaApplication
 import com.kharcha.app.data.CategoryTotal
 import com.kharcha.app.data.ExpenseWithCategory
 import com.kharcha.app.util.MonthRange
+import com.kharcha.app.util.Prefs
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -23,9 +24,19 @@ import kotlinx.coroutines.flow.stateIn
 class HomeViewModel(app: Application) : AndroidViewModel(app) {
 
     private val repository = (app as KharchaApplication).repository
+    private val prefs = Prefs(app)
 
     private val _month = MutableStateFlow(MonthRange.current())
     val month: StateFlow<MonthRange> = _month
+
+    private val _monthlyBudget = MutableStateFlow(prefs.monthlyBudgetPaise)
+    /** Overall monthly limit in paise; 0 means no budget set. */
+    val monthlyBudget: StateFlow<Long> = _monthlyBudget
+
+    fun setMonthlyBudget(paise: Long) {
+        prefs.monthlyBudgetPaise = paise
+        _monthlyBudget.value = paise
+    }
 
     val expenses: StateFlow<List<ExpenseWithCategory>> =
         _month.flatMapLatest { m -> repository.observeExpensesBetween(m.startMillis, m.endMillis) }

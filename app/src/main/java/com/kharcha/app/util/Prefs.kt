@@ -18,8 +18,14 @@ class Prefs(context: Context) {
         get() = prefs.getBoolean(KEY_ONBOARDING_DONE, false)
         set(value) = prefs.edit().putBoolean(KEY_ONBOARDING_DONE, value).apply()
 
+    /** The user's overall monthly spending limit, in paise. 0 means "no budget set". */
+    var monthlyBudgetPaise: Long
+        get() = prefs.getLong(KEY_MONTHLY_BUDGET, 0L)
+        set(value) = prefs.edit().putLong(KEY_MONTHLY_BUDGET, value).apply()
+
     companion object {
         private const val KEY_SERVICE_ENABLED = "shake_service_enabled"
         private const val KEY_ONBOARDING_DONE = "onboarding_complete"
+        private const val KEY_MONTHLY_BUDGET = "monthly_budget_paise"
     }
 }
