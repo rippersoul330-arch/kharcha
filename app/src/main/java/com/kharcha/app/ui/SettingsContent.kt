@@ -31,8 +31,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import android.widget.Toast
 import com.kharcha.app.util.Money
 
 @Composable
@@ -160,6 +162,7 @@ fun SettingsContent(
 
 @Composable
 private fun BudgetCard(budgetPaise: Long, onSetBudget: (Long) -> Unit) {
+    val context = LocalContext.current
     var text by remember(budgetPaise) {
         mutableStateOf(if (budgetPaise > 0) Money.paiseToPlainString(budgetPaise) else "")
     }
@@ -175,6 +178,14 @@ private fun BudgetCard(budgetPaise: Long, onSetBudget: (Long) -> Unit) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 4.dp, bottom = 12.dp)
             )
+            if (budgetPaise > 0) {
+                Text(
+                    text = "Current budget: ${Money.formatRupees(budgetPaise)}",
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(bottom = 12.dp)
+                )
+            }
             OutlinedTextField(
                 value = text,
                 onValueChange = { new -> text = new.filter { it.isDigit() || it == '.' } },
@@ -195,10 +206,20 @@ private fun BudgetCard(budgetPaise: Long, onSetBudget: (Long) -> Unit) {
                     TextButton(onClick = {
                         text = ""
                         onSetBudget(0L)
+                        Toast.makeText(context, "Budget cleared", Toast.LENGTH_SHORT).show()
                     }) { Text("Clear") }
                 }
                 Button(
-                    onClick = { parsed?.let { onSetBudget(it) } },
+                    onClick = {
+                        parsed?.let {
+                            onSetBudget(it)
+                            Toast.makeText(
+                                context,
+                                "Monthly budget set to ${Money.formatRupees(it)}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    },
                     enabled = parsed != null && parsed > 0,
                     modifier = Modifier.padding(start = 8.dp)
                 ) { Text("Save budget") }
