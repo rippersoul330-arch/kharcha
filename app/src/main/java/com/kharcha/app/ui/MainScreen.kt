@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,7 +21,11 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Card
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -29,8 +34,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -40,6 +46,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.kharcha.app.data.ExpenseWithCategory
@@ -60,8 +69,20 @@ fun MainScreen(
     var tab by remember { mutableStateOf(Tab.HOME) }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            TopAppBar(title = { Text("Kharcha") })
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        "Kharcha",
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background
+                )
+            )
         },
         bottomBar = {
             NavigationBar {
@@ -81,7 +102,11 @@ fun MainScreen(
         },
         floatingActionButton = {
             if (tab == Tab.HOME) {
-                FloatingActionButton(onClick = actions.onAddExpense) {
+                FloatingActionButton(
+                    onClick = actions.onAddExpense,
+                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    contentColor = MaterialTheme.colorScheme.onTertiary
+                ) {
                     Icon(Icons.Filled.Add, contentDescription = "Add expense")
                 }
             }
@@ -105,98 +130,176 @@ private fun HomeContent(viewModel: HomeViewModel, actions: AppActions) {
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp)
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 96.dp)
     ) {
+        // Month selector pill
+        item {
+            Surface(
+                shape = MaterialTheme.shapes.large,
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = { viewModel.showPreviousMonth() }) {
+                        Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Previous month")
+                    }
+                    Text(
+                        text = month.label,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    IconButton(
+                        onClick = { viewModel.showNextMonth() },
+                        enabled = !month.isCurrentMonth()
+                    ) {
+                        Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "Next month")
+                    }
+                }
+            }
+        }
+
+        // Pie chart card
+        item {
+            ElevatedCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 12.dp)
+            ) {
+                SpendingPieChart(
+                    totals = totals,
+                    grandTotalPaise = grandTotal,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+        }
+
+        // Expenses section header
         item {
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 20.dp, bottom = 8.dp, start = 4.dp, end = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(onClick = { viewModel.showPreviousMonth() }) {
-                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowLeft, contentDescription = "Previous month")
-                }
-                Text(text = month.label, style = MaterialTheme.typography.titleMedium)
-                IconButton(
-                    onClick = { viewModel.showNextMonth() },
-                    enabled = !month.isCurrentMonth()
-                ) {
-                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = "Next month")
+                Text(
+                    text = "Expenses",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.SemiBold
+                )
+                if (expenses.isNotEmpty()) {
+                    Text(
+                        text = "${expenses.size}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
-        }
-
-        item {
-            SpendingPieChart(
-                totals = totals,
-                grandTotalPaise = grandTotal,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
-        }
-
-        item {
-            Text(
-                text = "Expenses",
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
-            )
         }
 
         if (expenses.isEmpty()) {
-            item {
-                Text(
-                    text = "Nothing logged this month. Shake your phone or tap + to add one.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
-            }
+            item { EmptyExpenses() }
         } else {
             items(expenses, key = { it.id }) { expense ->
-                ExpenseRow(expense = expense, onClick = { actions.onEditExpense(expense.id) })
+                ExpenseRow(
+                    expense = expense,
+                    onClick = { actions.onEditExpense(expense.id) }
+                )
             }
         }
     }
 }
 
 @Composable
-private fun ExpenseRow(expense: ExpenseWithCategory, onClick: () -> Unit) {
-    val timeFmt = remember { SimpleDateFormat("d MMM, h:mm a", Locale.getDefault()) }
-    Row(
+private fun EmptyExpenses() {
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .clickableNoRipple(onClick)
-            .padding(vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(top = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Box(
-            modifier = Modifier
-                .size(12.dp)
-                .clip(CircleShape)
-                .background(colorFromHex(expense.colorHex))
+        Icon(
+            Icons.Filled.Savings,
+            contentDescription = null,
+            modifier = Modifier.size(56.dp),
+            tint = MaterialTheme.colorScheme.outline
         )
-        Spacer(modifier = Modifier.width(12.dp))
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = expense.categoryName ?: "Uncategorised",
-                style = MaterialTheme.typography.bodyLarge
-            )
-            val subtitle = buildString {
-                append(timeFmt.format(Date(expense.timestamp)))
-                if (!expense.note.isNullOrBlank()) append("  •  ${expense.note}")
+        Spacer(modifier = Modifier.height(12.dp))
+        Text(
+            text = "Nothing logged this month",
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = "Shake your phone or tap the + button to add your first expense.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 24.dp)
+        )
+    }
+}
+
+@Composable
+private fun ExpenseRow(expense: ExpenseWithCategory, onClick: () -> Unit) {
+    val timeFmt = remember { SimpleDateFormat("d MMM yyyy · h:mm a", Locale.getDefault()) }
+    Card(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 14.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Category avatar with the first letter
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(colorFromHex(expense.colorHex)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = (expense.categoryName ?: "?").take(1).uppercase(),
+                    color = Color.White,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
             }
+            Spacer(modifier = Modifier.width(14.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = expense.categoryName ?: "Uncategorised",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium
+                )
+                val subtitle = buildString {
+                    append(timeFmt.format(Date(expense.timestamp)))
+                    if (!expense.note.isNullOrBlank()) append("  •  ${expense.note}")
+                }
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+            Spacer(modifier = Modifier.width(12.dp))
             Text(
-                text = subtitle,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                text = Money.formatRupees(expense.amountPaise),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
             )
         }
-        Spacer(modifier = Modifier.width(12.dp))
-        Text(
-            text = Money.formatRupees(expense.amountPaise),
-            style = MaterialTheme.typography.titleMedium
-        )
     }
 }

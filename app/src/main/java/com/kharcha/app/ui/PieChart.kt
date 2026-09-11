@@ -22,7 +22,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.kharcha.app.data.CategoryTotal
 import com.kharcha.app.util.Money
@@ -44,6 +46,7 @@ fun SpendingPieChart(
     grandTotalPaise: Long,
     modifier: Modifier = Modifier
 ) {
+    val emptyRingColor = MaterialTheme.colorScheme.surfaceVariant
     Column(modifier = modifier.fillMaxWidth()) {
         Box(
             modifier = Modifier
@@ -66,7 +69,7 @@ fun SpendingPieChart(
                 if (grandTotalPaise <= 0L) {
                     // Empty ring when there's nothing yet.
                     drawArc(
-                        color = Color(0xFFE0E0E0),
+                        color = emptyRingColor,
                         startAngle = 0f,
                         sweepAngle = 360f,
                         useCenter = false,
@@ -77,31 +80,34 @@ fun SpendingPieChart(
                     return@Canvas
                 }
 
+                val gap = if (totals.size > 1) 3f else 0f
                 var startAngle = -90f
                 totals.forEach { slice ->
-                    val sweep = (slice.totalPaise.toFloat() / grandTotalPaise.toFloat()) * 360f
+                    val fullSweep = (slice.totalPaise.toFloat() / grandTotalPaise.toFloat()) * 360f
                     drawArc(
                         color = colorFromHex(slice.colorHex),
-                        startAngle = startAngle,
-                        sweepAngle = sweep,
+                        startAngle = startAngle + gap / 2f,
+                        sweepAngle = (fullSweep - gap).coerceAtLeast(1f),
                         useCenter = false,
                         topLeft = topLeft,
                         size = arcSize,
-                        style = Stroke(width = stroke)
+                        style = Stroke(width = stroke, cap = StrokeCap.Round)
                     )
-                    startAngle += sweep
+                    startAngle += fullSweep
                 }
             }
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "This month",
+                    text = "Spent",
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
                     text = Money.formatRupees(grandTotalPaise),
-                    style = MaterialTheme.typography.headlineMedium
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
         }
