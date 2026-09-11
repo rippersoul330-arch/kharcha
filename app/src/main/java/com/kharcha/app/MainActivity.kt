@@ -19,7 +19,9 @@ import com.kharcha.app.ui.AppActions
 import com.kharcha.app.ui.AppStatus
 import com.kharcha.app.ui.HomeViewModel
 import com.kharcha.app.ui.MainScreen
+import com.kharcha.app.ui.OnboardingScreen
 import com.kharcha.app.ui.theme.KharchaTheme
+import com.kharcha.app.util.AutostartHelper
 import com.kharcha.app.util.Exporter
 import com.kharcha.app.util.Prefs
 import androidx.compose.runtime.getValue
@@ -37,6 +39,9 @@ class MainActivity : ComponentActivity() {
 
     // Live status the UI observes; refreshed in onResume.
     private val statusState = mutableStateOf(AppStatus(false, false, false))
+
+    // Whether first-run onboarding has been completed.
+    private val onboardingDoneState = mutableStateOf(true)
 
     // Set when the user toggled "shake on" but still needs to grant overlay permission.
     private var pendingEnableAfterOverlay = false
@@ -62,27 +67,74 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         prefs = Prefs(this)
+        onboardingDoneState.value = prefs.onboardingComplete
         refreshStatus()
 
         setContent {
             KharchaTheme {
-                val vm: HomeViewModel = viewModel()
                 val status by statusState
-                MainScreen(
-                    viewModel = vm,
-                    status = status,
-                    actions = AppActions(
-                        onAddExpense = ::openAddExpense,
-                        onEditExpense = ::openEditExpense,
-                        onToggleShake = ::toggleShake,
+                if (!onboardingDoneState.value) {
+                    OnboardingScreen(
+                        status = status,
+                        needsAutostart = AutostartHelper.needsAutostart(),
+                        brandLabel = AutostartHelper.brandLabel(),
                         onGrantOverlay = ::requestOverlayPermission,
-                        onIgnoreBattery = ::openBatterySettings,
+                        onGrantNotifications = ::requestNotifications,
+                        onOpenBattery = ::openBatterySettings,
+                        onOpenAutostart = ::openAutostartSettings,
                         onTestOverlay = ::testOverlay,
-                        onExport = ::startExport,
-                        onSendFeedback = ::sendFeedback
+                        onFinish = ::finishOnboarding
+                    )
+                } else {
+                    val vm: HomeViewModel = viewModel()
+                    MainScreen(
+                        viewModel = vm,
+                        status = status,
+                        actions = AppActions(
+                            onAddExpense = ::openAddExpense,
+                            onEditExpense = ::openEditExpense,
+                            onToggleShake = ::toggleShake,
+                            onGrantOverlay = ::requestOverlayPermission,
+                            onIgnoreBattery = ::openBatterySettings,
+                            onTestOverlay = ::testOverlay,
+                            onExport = ::startExport,
+                            onSendFeedback = ::sendFeedback
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    private fun requestNotifications() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !notificationsGranted()) {
+            notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
+    }
+
+    private fun openAutostartSettings() {
+        val opened = AutostartHelper.openAutostartSettings(this)
+        if (!opened) {
+            // Fall back to the app's details page where auto-start often lives.
+            try {
+                startActivity(
+                    Intent(
+                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.parse("package:$packageName")
                     )
                 )
+            } catch (_: Exception) {
+                Toast.makeText(this, "Open Settings > Apps > Kharcha to find Auto-start.", Toast.LENGTH_LONG).show()
             }
+        }
+    }
+
+    private fun finishOnboarding() {
+        prefs.onboardingComplete = true
+        onboardingDoneState.value = true
+        // If the overlay permission is granted, switch the shake listener on right away.
+        if (Settings.canDrawOverlays(this)) {
+            enableShakeService()
         }
     }
 
