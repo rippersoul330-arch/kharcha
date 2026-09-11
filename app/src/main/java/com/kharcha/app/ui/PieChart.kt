@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -49,14 +48,12 @@ fun SpendingPieChart(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(1.6f),
+                .height(240.dp)
+                .padding(vertical = 8.dp),
             contentAlignment = Alignment.Center
         ) {
             Canvas(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1f)
-                    .padding(24.dp)
+                modifier = Modifier.size(200.dp)
             ) {
                 val stroke = size.minDimension * 0.18f
                 val diameter = size.minDimension - stroke
