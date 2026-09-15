@@ -56,7 +56,7 @@ fun OnboardingScreen(
             .padding(20.dp)
     ) {
         Text(
-            "Welcome to Kharcha 👋",
+            "Welcome to Shake Exchange 👋",
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
@@ -85,8 +85,8 @@ fun OnboardingScreen(
             StepCard(
                 number = "2",
                 title = "Allow notifications",
-                description = "Android requires a small \"Kharcha is running\" notification while " +
-                    "the shake listener is on.",
+                description = "Android requires a small \"Shake Exchange is running\" notification " +
+                    "while the shake listener is on.",
                 done = status.notificationsGranted,
                 buttonText = if (status.notificationsGranted) "Granted" else "Allow",
                 onClick = onGrantNotifications
@@ -96,8 +96,8 @@ fun OnboardingScreen(
         StepCard(
             number = if (needsNotificationStep) "3" else "2",
             title = "Keep it running (battery)",
-            description = "Stops your phone from pausing Kharcha to save battery, which would " +
-                "break shake detection.",
+            description = "Stops your phone from pausing Shake Exchange to save battery, which " +
+                "would break shake detection.",
             done = null,
             buttonText = "Open battery settings",
             onClick = onOpenBattery

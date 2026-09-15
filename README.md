@@ -1,4 +1,4 @@
-# Kharcha 💸
+# Shake Exchange 💸
 
 A dead-simple **Android** expense tracker built around one idea: logging a spend
 should take about two seconds. Shake your phone from *anywhere* — even inside
@@ -6,7 +6,8 @@ YouTube or Instagram — and a floating button pops up. Tap it, type the amount,
 pick a category, done. Open the app any time to see a **pie chart** of the
 month's spending.
 
-> Working name: **Kharcha** (Hindi for "expense/spending"). Currency: ₹ (INR).
+> App name: **Shake Exchange**. Currency: ₹ (INR).
+> (The internal code package is still `com.kharcha.app` — that's just an identifier and doesn't affect the visible name.)
 
 ## Features (v1)
 - 🤳 **Shake to log** from any screen — a floating button appears over other apps.

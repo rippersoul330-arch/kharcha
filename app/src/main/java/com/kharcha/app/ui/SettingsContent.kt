@@ -109,7 +109,7 @@ fun SettingsContent(
                         style = MaterialTheme.typography.titleMedium
                     )
                     Text(
-                        "To show the floating button over other apps, Kharcha needs the " +
+                        "To show the floating button over other apps, Shake Exchange needs the " +
                             "\"appear on top\" permission.",
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(vertical = 8.dp)
@@ -128,7 +128,7 @@ fun SettingsContent(
                 Text("Keep it reliable", style = MaterialTheme.typography.titleMedium)
                 Text(
                     "Some phones stop background apps to save battery, which can break " +
-                        "shake detection. Allow Kharcha to keep running for best results.",
+                        "shake detection. Allow Shake Exchange to keep running for best results.",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(vertical = 8.dp)
@@ -167,7 +167,7 @@ fun SettingsContent(
 
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            "Kharcha • v1.0 — your data stays on this phone.",
+            "Shake Exchange • v1.0 — your data stays on this phone.",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
