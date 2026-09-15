@@ -46,7 +46,7 @@ class ShakeDetectionService : Service() {
             sensorManager.registerListener(
                 shakeDetector,
                 it,
-                SensorManager.SENSOR_DELAY_NORMAL
+                SensorManager.SENSOR_DELAY_UI
             )
         }
     }
